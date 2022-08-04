@@ -1,0 +1,9 @@
+.header__signedIn-details_show {
+  display: flex;
+  flex-direction: column; 
+  margin: 0 auto;
+  gap: 18px;
+  min-height: 75px;
+  padding: 0;
+  align-items: center;
+}
