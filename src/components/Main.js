@@ -6,6 +6,19 @@ import Card from './Card.js';
 function Main( {onEditProfile, onAddPlace, onEditAvatar, onConfirmation, cards, onCardClick, onCardLike, onCardDelete} ) {
   const currentUser = useContext(CurrentUserContext);
  
+  const cardsElements = cards.map((card) => {
+    return (
+      <Card
+        key={card._id}
+        card={card}
+        onCardClick={onCardClick}
+        onCardLike={onCardLike}
+        onCardDelete={onCardDelete}
+        onConfirmation={onConfirmation}
+      />
+    )
+  })
+  
   return (
     <div className="content">
       <section className="profile">
@@ -34,18 +47,7 @@ function Main( {onEditProfile, onAddPlace, onEditAvatar, onConfirmation, cards, 
       </section>
       <section className="cards">
         <div className="cards__container">
-          { cards.map((card) => {
-            return (
-              <Card
-                key={card._id}
-                card={card}
-                onCardClick={onCardClick}
-                onCardLike={onCardLike}
-                onCardDelete={onCardDelete}
-                onConfirmation={onConfirmation}
-              />
-            )
-          })}
+          {cardsElements}
         </div>
       </section>
     </div>

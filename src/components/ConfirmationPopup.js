@@ -1,34 +1,25 @@
-import { useEffect } from 'react';
+import PopupWithForm from "./PopupWithForm";
 
-import PopupWithForm from './PopupWithForm';
+function ConfirmationPopup({ isPopupOpened, onClose, card, onDeleteCard }) {
+  function handleSubmit(event) {
+    event.preventDefault();
 
-function ConfirmationPopup( {isOpen, onClose, card, setSelectedCard, onDeleteCard} ) {
-
-    useEffect(() => {
-        if(isOpen) {
-            setSelectedCard(card)
-        }
-      }, [card, isOpen, setSelectedCard]);
-    
-    function handleSubmit(event) {
-      event.preventDefault();
-
-      onDeleteCard(card)
-    }
+    onDeleteCard(card);
+  }
 
   return (
     <PopupWithForm
       name="confirmation"
-      title="Вы уверены?" 
+      title="Вы уверены?"
       type="updated"
       button="Да"
-      isOpen={isOpen}
+      isPopupOpened={isPopupOpened}
       onClose={onClose}
       onSubmit={handleSubmit}
       isDisabled={true}
     >
     </PopupWithForm>
-  )
+  );
 }
 
 export default ConfirmationPopup;

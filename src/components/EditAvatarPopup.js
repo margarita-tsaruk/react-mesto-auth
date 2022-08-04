@@ -3,23 +3,23 @@ import { useForm } from '../hooks/useForm.js';
 
 import PopupWithForm from './PopupWithForm';
 
-function EditAvatarPopup(props) {
+function EditAvatarPopup( {isPopupOpened, onClose, onUpdateAvatar} ) {
   const { values, setValues, handleChange, errors, isValid, resetErrors } = useForm({});
  
   function handleSubmit(event) {
     event.preventDefault();
 
-    props.onUpdateAvatar({
+    onUpdateAvatar({
       avatar: values.link,
     });
   }
 
   useEffect(() => {
-    if(props.isOpen) {
+    if(isPopupOpened) {
       setValues({});
       resetErrors();
     }
-  }, [props.isOpen]);
+  }, [isPopupOpened]);
 
   return (
     <PopupWithForm
@@ -27,8 +27,8 @@ function EditAvatarPopup(props) {
       title="Обновить аватар" 
       type="modified"
       button="Сохранить"
-      isOpen={props.isOpen}
-      onClose={props.onClose}
+      isPopupOpened={isPopupOpened}
+      onClose={onClose}
       onSubmit={handleSubmit}
       isDisabled={isValid}
     >
@@ -45,7 +45,7 @@ function EditAvatarPopup(props) {
       <span 
         className="popup__error popup__error_top" 
         id="link-avatar-error">
-          {isValid ? '' : errors.link}
+          {!isValid && errors.link}
       </span>
     </PopupWithForm>
   )

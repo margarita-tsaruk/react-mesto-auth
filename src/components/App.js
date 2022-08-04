@@ -22,16 +22,15 @@ function App() {
   const [isAddPlacePopupOpen, setIsAddPlacePopupOpen] = useState(false);
   const [isEditAvatarPopupOpen, setIsEditAvatarPopupOpen] = useState(false);
   const [isImagePopupOpen, setIsImagePopupOpen] = useState(false);
-  const [isСonfirmationPopupOpen, setIsСonfirmationPopupOpen] = useState(false);
+  const [isConfirmationPopupOpen, setIsConfirmationPopupOpen] = useState(false);
   const [isInfoTooltipPopupOpen, setIsInfoTooltipPopupOpen] = useState(false);
-  const isOpen = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || isImagePopupOpen || isСonfirmationPopupOpen
+  const isPopupOpened = isEditAvatarPopupOpen || isEditProfilePopupOpen || isAddPlacePopupOpen || isImagePopupOpen || isConfirmationPopupOpen
 
   const [selectedCard, setSelectedCard] = useState(null);
   const [currentUser, setCurrentUser] = useState({});
   const [cards, setCards] = useState([]);
 
-  const [isSignedIn, setIsSignedIn] = useState(false);
-  const [isSignedUp, setIsSignedUp] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const history = useHistory();
   
@@ -60,7 +59,7 @@ function App() {
 
   function handleTrashButtonClick(card) {
     setSelectedCard(card);
-    setIsСonfirmationPopupOpen(true);
+    setIsConfirmationPopupOpen(true);
   }
 
   function handleCardClick(card) {
@@ -77,7 +76,7 @@ function App() {
     setIsAddPlacePopupOpen(false);
     setIsEditAvatarPopupOpen(false);
     setIsImagePopupOpen(false);
-    setIsСonfirmationPopupOpen(false);
+    setIsConfirmationPopupOpen(false);
     setIsInfoTooltipPopupOpen(false);
   }
 
@@ -87,13 +86,13 @@ function App() {
         closeAllPopups();
       }
     }
-    if(isOpen) {
+    if(isPopupOpened) {
       document.addEventListener('keydown', closeByEscape);
       return () => {
         document.removeEventListener('keydown', closeByEscape);
       }
     }
-  }, [isOpen]) 
+  }, [isPopupOpened]) 
 
   function handleUpdateUser(value) {
     api.setUserInfo(value.name, value.about)
@@ -166,48 +165,71 @@ function App() {
       })
   }
   
-  function handleRegistration(userData) {
-    auth.register(userData)
-      .then((userData) => {
-        setIsSignedUp(true);
-        handleInfoTooltip();
-        history.push('/sign-in');
-      },
-        (err) => {
-          console.log(err);
-          setIsSignedUp(false);
-          handleInfoTooltip();
-        }
-      )
-  }
-
   function handleCheckToken() {
     const jwt = localStorage.getItem('jwt');
     auth.getToken(jwt)
       .then((data) => {
+        if(data) {
           setUserEmail(data.data.email);
-          setIsSignedIn(true);
-          history.push('/');
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+          localStorage.removeItem('jwt');
+        }
       })
       .catch((err) => {
         console.log(err);
       })
   } 
 
-  function handleAuthorization(userData) {
-    auth.authorize(userData)
-      .then((userData) => {
-        localStorage.setItem('jwt', userData.token);
-        setIsSignedIn(true);
-        handleCheckToken();
+  useEffect(() => {
+    handleCheckToken()
+  }, [])
+
+  useEffect(() => {
+    if(isLoggedIn) {
+      history.push('/');
+    }
+  }, [history, isLoggedIn])
+
+  function handleRegistration(userData) {
+    auth.register(userData)
+    .then((userData) => {
+        if(userData) {
+          setIsLoggedIn(true)
+          handleInfoTooltip();
+        } else {
+          setIsLoggedIn(false);
+          handleInfoTooltip();
+        }
       })
       .catch((err) => {
         console.log(err);
+        setIsLoggedIn(false);
+        handleInfoTooltip();
+      })
+  }
+
+  function handleAuthorization(userData) {
+    auth.authorize(userData)
+      .then((userData) => {
+        if(userData.token) {
+          localStorage.setItem('jwt', userData.token);
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+          handleInfoTooltip();;
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        setIsLoggedIn(false);
+        handleInfoTooltip();
       })
   }
 
   function handleSignOut() {
-    setIsSignedIn(false);
+    setIsLoggedIn(false);
     localStorage.removeItem('jwt');
     history.push('/sign-in');
   }
@@ -216,7 +238,7 @@ function App() {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
         <Header 
-         isSignedIn={isSignedIn}
+         isLoggedIn={isLoggedIn}
          userEmail={userEmail}
          onSignOut={handleSignOut}
         />
@@ -237,7 +259,7 @@ function App() {
           </Route>
           <ProtectedRoute
             exact path="/"
-            isSignedIn={isSignedIn}
+            isLoggedIn={isLoggedIn}
             component={Main} 
             onEditProfile={handleEditProfileClick}
             onAddPlace={handleAddPlaceClick}
@@ -251,36 +273,36 @@ function App() {
         </Switch> 
         <Footer />
         <EditProfilePopup
-          isOpen={isEditProfilePopupOpen}
+          isPopupOpened={isEditProfilePopupOpen}
           onClose={closeAllPopups}
           onUpdateUser={handleUpdateUser}
         />
         <AddPlacePopup 
-          isOpen={isAddPlacePopupOpen}
+          isPopupOpened={isAddPlacePopupOpen}
           onClose={closeAllPopups}
           onAddPlace={handleAddPlace}
         />
         <EditAvatarPopup
-          isOpen={isEditAvatarPopupOpen}
+          isPopupOpened={isEditAvatarPopupOpen}
           onClose={closeAllPopups}
           onUpdateAvatar={handleUpdateAvatar} 
         />
         <ImagePopup 
-          isOpen={isImagePopupOpen}
+          isPopupOpened={isImagePopupOpen}
           card={selectedCard}
           onClose={closeAllPopups}
         />
         <ConfirmationPopup 
-          isOpen={isСonfirmationPopupOpen}
+          isPopupOpened={isConfirmationPopupOpen}
           onClose={closeAllPopups}
           card={selectedCard}
           setSelectedCard={setSelectedCard}
           onDeleteCard={handleCardDelete} 
         />
         <InfoTooltip
-          isOpen={isInfoTooltipPopupOpen}
+          isPopupOpened={isInfoTooltipPopupOpen}
           onClose={closeAllPopups}
-          isSignedUp={isSignedUp}
+          isLoggedIn={isLoggedIn}
         />
        </div>
     </CurrentUserContext.Provider>

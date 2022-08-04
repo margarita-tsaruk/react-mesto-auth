@@ -1,34 +1,34 @@
-import { useState } from 'react';
 import { Switch, Route, Link } from 'react-router-dom';
+import { useState } from 'react';
 
 import headerLogo from '../images/logo.svg'
 
-function Header(props) {
-  const [isLogged, setIsLogged] = useState(false);
-
+function Header( {isLoggedIn, userEmail, onSignOut} ) {
+  const [isOpenMenu, setIsOpenMenu] = useState(false);
+  
   function showMenu() {
-    setIsLogged(!isLogged);
+    setIsOpenMenu(!isOpenMenu)
   }
   
   function signOut() {
-    setIsLogged(false);
-    props.onSignOut();
+    setIsOpenMenu(false);
+    onSignOut();
   }
   
   return (
-    <header className={!isLogged ? 'header' : 'header header__menu'}>
+    <header className={!isOpenMenu ? 'header' : 'header header__menu'}>
       <div className="header__container">
         <img className="header__logo" src={headerLogo} alt="Лого" /> 
         <button 
-          className={`${!isLogged ? 'header__menu-button' : `header__menu-button header__menu-button_close`}
-          ${!props.isSignedIn ? 'header__menu-button_signedout' : ''}`}
+          className={`${!isOpenMenu ? 'header__menu-button' : `header__menu-button header__menu-button_close`}
+          ${!isLoggedIn && 'header__menu-button_signedout'}`}
           onClick={showMenu}
         >
         </button>
       </div>
       <Switch>
         <Route path="/sign-in">
-          <div className={`${props.isSignedIn ? '' : 'header__link header__link_hover'}`}>
+          <div className={`${!isLoggedIn && 'header__link header__link_hover'}`}>
             <nav>
               <Link
                 className='header__link'
@@ -40,7 +40,7 @@ function Header(props) {
           </div>
         </Route>
         <Route path="/sign-up">
-          <div className={`${props.isSignedIn ? '' : 'header__link header__link_hover'}`}>
+          <div className={`${!isLoggedIn && 'header__link header__link_hover'}`}>
             <nav>
               <Link
                 className='header__link'
@@ -52,8 +52,8 @@ function Header(props) {
           </div>
         </Route>
         <Route exact path="/">
-          <div className={!isLogged ? 'header__signedIn-details' : 'header__signedIn-details header__signedIn-details_show'}>
-            <p className='header__email'>{props.userEmail}</p>
+          <div className={!isOpenMenu ? 'header__signedIn-details' : 'header__signedIn-details header__signedIn-details_show'}>
+            <p className='header__email'>{userEmail}</p>
             <button
               className='header__sign-out-button'
               onClick={signOut}

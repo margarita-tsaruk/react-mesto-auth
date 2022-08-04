@@ -6,12 +6,12 @@ class Auth {
     this.headers = headers;
   }
   
-	_getServerResponse(res) {
+  _getServerResponse(res) {
     if(res.ok) { 
-			return res.json(); 
-		} else { 
-			return Promise.reject(`Ошибка: ${res.status}`); 
-		} 
+      return res.json(); 
+    } else { 
+      return Promise.reject(`Ошибка: ${res.status} ${res.statusText}`); 
+    } 
   }
   
   register(userData) {
@@ -23,7 +23,7 @@ class Auth {
         email: userData.email
       })
     })
-		.then(this._getServerResponse)
+    .then(this._getServerResponse)
   }
   
   authorize(userData) {
@@ -35,7 +35,7 @@ class Auth {
         email: userData.email
       })
     })
-		.then(this._getServerResponse);
+    .then(this._getServerResponse);
   }
   
   getToken(token) {
@@ -46,7 +46,7 @@ class Auth {
         authorization: `Bearer ${token}`
       }
     })
-		.then(this._getServerResponse);
+    .then(this._getServerResponse);
   }
 }
 

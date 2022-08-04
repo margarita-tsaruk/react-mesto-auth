@@ -1,18 +1,15 @@
 import { useForm } from '../hooks/useForm.js';
 import { Link } from 'react-router-dom';
 
-function Register(props) {
+function Register( {onSignedUp} ) {
   const { values, handleChange, errors, isValid, resetErrors } = useForm({});
     
   function handleSubmit(event) {
     event.preventDefault();
         
-    props.onSignedUp({
-      password: values.password,
-      email: values.email
-		})
+    onSignedUp({...values});
 
-		resetErrors();
+    resetErrors();
   }
   
   return (
@@ -25,7 +22,7 @@ function Register(props) {
         id="name-input"
         type="email"
         name="email"
-        className={`auth__input ${errors.email ? 'auth__input_type_invalid' : ''}`}
+        className={`auth__input ${errors.email && 'auth__input_type_invalid'}`}
         placeholder="Email"
         minLength="2"
         maxLength="40"
@@ -33,14 +30,14 @@ function Register(props) {
         value={values.email || ''}
         onChange={handleChange}
       />
-			<span className="auth__error auth__error_top" id="input-email-error">
-        {isValid ? '' : errors.email}
+      <span className="auth__error auth__error_top" id="input-email-error">
+        {!isValid && errors.email}
       </span>
       <input
         id="password-input"
         type="password"
         name="password"
-        className={`auth__input ${errors.password ? 'auth__input_type_invalid' : ''}`}
+        className={`auth__input ${errors.password && 'auth__input_type_invalid'}`}
         placeholder="Пароль"
         minLength="2"
         maxLength="40"
@@ -48,9 +45,9 @@ function Register(props) {
         value={values.password || ''}
         onChange={handleChange}
       />
-			<span className="auth__error auth__error_bottom" id="input-password-error">
-        {isValid ? '' : errors.password}
-			</span>
+      <span className="auth__error auth__error_bottom" id="input-password-error">
+        {!isValid && errors.password}
+      </span>
       <button 
         type="submit" 
         className="auth__button"
@@ -59,7 +56,7 @@ function Register(props) {
       </button>
       <p className="auth__paragraph">
         Уже зарегистрированы?
-				<Link className="auth__link" to="/sign-in"> Войти</Link>
+        <Link className="auth__link" to="/sign-in"> Войти</Link>
       </p>
     </form> 
   );

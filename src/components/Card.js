@@ -2,7 +2,7 @@ import { useContext } from 'react';
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js'
 
 function Card( {card, onCardClick, onCardLike, onConfirmation} ) {
-  function handleClick() {
+  function handleImageClick() {
     onCardClick(card)
   }
 
@@ -32,7 +32,7 @@ function Card( {card, onCardClick, onCardLike, onConfirmation} ) {
         src={card.link} 
         alt={card.name} 
         className="card__image"
-        onClick={handleClick}
+        onClick={handleImageClick}
       />
       <h3 className="card__title">{card.name}</h3>
       <button 
