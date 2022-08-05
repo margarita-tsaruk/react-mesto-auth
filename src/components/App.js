@@ -34,16 +34,50 @@ function App() {
   const [userEmail, setUserEmail] = useState('');
   const history = useHistory();
   
-  useEffect(() => {
-    api.getData()
-      .then(([userData, cardsData]) => {
-        setCurrentUser(userData)
-        setCards(cardsData)
+  function handleCheckToken() {
+    const jwt = localStorage.getItem('jwt');
+    if(!jwt) {
+      return
+    }
+    
+    auth.getToken(jwt)
+      .then((data) => {
+        console.log(data)
+        if(data) {
+          setUserEmail(data.data.email);
+          setIsLoggedIn(true);
+        } else {
+          setIsLoggedIn(false);
+          localStorage.removeItem('jwt');
+        }
       })
       .catch((err) => {
         console.log(err);
       })
+  } 
+
+  useEffect(() => {
+    handleCheckToken()
   }, [])
+
+  useEffect(() => {
+    if(isLoggedIn) {
+      history.push('/');
+    }
+  }, [history, isLoggedIn])
+
+  useEffect(() => {
+    if(isLoggedIn) {
+      api.getData()
+      .then(([userData, cardsData]) => {
+          setCurrentUser(userData)
+          setCards(cardsData)
+      })
+      .catch((err) => {
+        console.log(err);
+      })
+    } 
+  }, [isLoggedIn])
 
   function handleEditProfileClick() {
     setIsEditProfilePopupOpen(true);
@@ -165,39 +199,14 @@ function App() {
       })
   }
   
-  function handleCheckToken() {
-    const jwt = localStorage.getItem('jwt');
-    auth.getToken(jwt)
-      .then((data) => {
-        if(data) {
-          setUserEmail(data.data.email);
-          setIsLoggedIn(true);
-        } else {
-          setIsLoggedIn(false);
-          localStorage.removeItem('jwt');
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-      })
-  } 
-
-  useEffect(() => {
-    handleCheckToken()
-  }, [])
-
-  useEffect(() => {
-    if(isLoggedIn) {
-      history.push('/');
-    }
-  }, [history, isLoggedIn])
-
   function handleRegistration(userData) {
     auth.register(userData)
     .then((userData) => {
-        if(userData) {
+      console.log(userData)
+      if(userData) {
           setIsLoggedIn(true)
           handleInfoTooltip();
+         ;
         } else {
           setIsLoggedIn(false);
           handleInfoTooltip();
@@ -218,7 +227,7 @@ function App() {
           setIsLoggedIn(true);
         } else {
           setIsLoggedIn(false);
-          handleInfoTooltip();;
+          handleInfoTooltip();
         }
       })
       .catch((err) => {
