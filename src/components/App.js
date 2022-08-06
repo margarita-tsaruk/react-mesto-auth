@@ -42,10 +42,9 @@ function App() {
     
     auth.getToken(jwt)
       .then((data) => {
-        console.log(data)
         if(data) {
-          setUserEmail(data.data.email);
           setIsLoggedIn(true);
+          setUserEmail(data.data.email);
         } else {
           setIsLoggedIn(false);
           localStorage.removeItem('jwt');
@@ -70,8 +69,8 @@ function App() {
     if(isLoggedIn) {
       api.getData()
       .then(([userData, cardsData]) => {
-          setCurrentUser(userData)
-          setCards(cardsData)
+        setCurrentUser(userData)
+        setCards(cardsData)
       })
       .catch((err) => {
         console.log(err);
@@ -199,26 +198,6 @@ function App() {
       })
   }
   
-  function handleRegistration(userData) {
-    auth.register(userData)
-    .then((userData) => {
-      console.log(userData)
-      if(userData) {
-          setIsLoggedIn(true)
-          handleInfoTooltip();
-         ;
-        } else {
-          setIsLoggedIn(false);
-          handleInfoTooltip();
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        setIsLoggedIn(false);
-        handleInfoTooltip();
-      })
-  }
-
   function handleAuthorization(userData) {
     auth.authorize(userData)
       .then((userData) => {
@@ -235,6 +214,24 @@ function App() {
         setIsLoggedIn(false);
         handleInfoTooltip();
       })
+  }
+
+  function handleRegistration(userData) {
+    auth.register(userData)
+    .then((data) => {
+      if(data) {
+        setTimeout(()=> handleAuthorization(userData), 300); //Пришлось добавить setTimeout тк сервер падает из-за частых запросов
+        handleInfoTooltip();
+        setUserEmail(data.data.email);
+      } else {
+        handleInfoTooltip();
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+      setIsLoggedIn(false);
+      handleInfoTooltip();
+    })
   }
 
   function handleSignOut() {
